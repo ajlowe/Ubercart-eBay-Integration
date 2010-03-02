@@ -1,0 +1,68 @@
+<?php
+// $Id$
+
+/**
+ * Installation hooks for uc_ebay.module.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function uc_ebay_schema() {
+  $schema = array();
+
+  $schema['uc_ebay_item_transactions'] = array(
+    'fields' => array(
+      'item_id' => array(
+        'type' => 'varchar',
+        'length' => 38,
+        'not null' => TRUE,
+      ),
+      'transaction_id' => array(
+        'type' => 'varchar',
+        'length' => 38,
+        'not null' => TRUE,
+      ),
+      'order_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'order_product_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'order_id' => array('order_id'),
+    ),
+    'primary key' => array('item_id', 'transaction_id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function uc_ebay_install() {
+  drupal_install_schema('uc_ebay');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function uc_ebay_uninstall() {
+  drupal_uninstall_schema('uc_ebay');
+
+  db_query("DELETE FROM {variable} WHERE name LIKE 'uc_ebay_%%'");
+}
+
+function uc_ebay_update_6001() {
+  $ret = array();
+
+  db_add_field($ret, 'uc_ebay_item_transactions', 'order_product_id', array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE));
+
+  return $ret;
+}
